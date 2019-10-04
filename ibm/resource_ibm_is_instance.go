@@ -501,8 +501,14 @@ func resourceIBMisInstanceCreate(d *schema.ResourceData, meta interface{}) error
 
 	d.SetId(instance.ID.String())
 	log.Printf("[INFO] Instance : %s", instance.ID.String())
+	d.Set(isInstanceStatus, instance.Status)
 
-	_, err = isWaitForInstanceAvailable(instanceC, d.Id(), d)
+	var tmp interface{}
+	tmp, err = isWaitForInstanceAvailable(instanceC, d.Id(), d)
+	instance = tmp.(*models.Instance)
+	if instance != nil {
+		d.Set(isInstanceStatus, instance.Status)
+	}
 	if err != nil {
 		return err
 	}
